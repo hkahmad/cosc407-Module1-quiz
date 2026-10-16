@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>COSC407 Quiz</title>
+  <meta name="description" content="Practice quiz for COSC407 Module 1: Course Preliminaries & Language Evaluation Criteria.">
+  <meta name="theme-color" content="#1e3a5f">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    :root {
+      --bg: #f4f6fa; --card: #ffffff; --text: #1c2433; --muted: #637088;
+      --accent: #1e3a5f; --accent-text: #ffffff; --border: #dfe4ec;
+      --good: #16a34a; --good-bg: #dcfce7; --bad: #dc2626; --bad-bg: #fee2e2;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #11151c; --card: #1a202b; --text: #e6e9ef; --muted: #98a2b5;
+        --accent: #7fb3e6; --accent-text: #11151c; --border: #2a3242;
+        --good: #4ade80; --good-bg: #14301f; --bad: #f87171; --bad-bg: #3a1a1a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      display: flex; justify-content: center; align-items: flex-start; padding: 24px 16px;
+    }
+    main { width: 100%; max-width: 560px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    h2 { margin: 0 0 20px; font-size: 1.15rem; line-height: 1.45; }
+    p { color: var(--muted); margin: 0 0 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; }
+    select, button {
+      font: inherit; width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+    }
+    button { cursor: pointer; text-align: left; margin-bottom: 10px; }
+    button:hover:not(:disabled) { border-color: var(--accent); }
+    button:disabled { cursor: default; }
+    .primary { background: var(--accent); color: var(--accent-text); border: none; text-align: center; font-weight: 600; margin-top: 16px; }
+    .correct { background: var(--good-bg); border-color: var(--good); }
+    .wrong { background: var(--bad-bg); border-color: var(--bad); }
+    .top { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+    .bar { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+    .bar div { height: 100%; background: var(--accent); transition: width .3s; }
+    .explain { margin: 8px 0 0; padding: 12px; border-radius: 10px; background: var(--bg); color: var(--text); }
+    .score { font-size: 3rem; font-weight: 700; margin: 8px 0; }
+    .small { font-size: .85rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <!-- Start screen -->
+  <section id="start" class="card">
+    <h1>COSC407 Quiz</h1>
+    <p>Module 1: Course Preliminaries &amp; Language Evaluation Criteria</p>
+    <label for="category">Section</label>
+    <select id="category"></select>
+    <label for="length" style="margin-top:16px">Number of questions</label>
+    <select id="length">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="999">All</option>
+    </select>
+    <button class="primary" id="startBtn">Start quiz</button>
+    <p id="best" style="margin:12px 0 0;text-align:center"></p>
+    <p class="small" style="margin:16px 0 0;text-align:center">Based on the Module 1 lecture notes by Dr. Hafsa Kabir Ahmad (Sebesta, 12th Ed.)</p>
+  </section>
+
+  <!-- Question screen -->
+  <section id="quiz" class="card hidden">
+    <div class="top"><span id="progress"></span><span id="topic"></span></div>
+    <div class="bar"><div id="barFill"></div></div>
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <div id="explain" class="explain hidden"></div>
+    <button class="primary hidden" id="nextBtn">Next</button>
+  </section>
+
+  <!-- Result screen -->
+  <section id="result" class="card hidden" style="text-align:center">
+    <h1>Done!</h1>
+    <div class="score" id="score"></div>
+    <p id="message"></p>
+    <button class="primary" id="againBtn">Play again</button>
+  </section>
+</main>
+
+<script>
+// c = section, q = question, o = options, a = index of correct option, e = explanation
+const QUESTIONS = [
+  // 1. Reasons to Study Language Concepts
+  { c: "Reasons to Study", q: "After learning Perl, a C programmer simulates associative arrays in C. Which reason for studying language concepts does this illustrate?", o: ["Increased capacity to express ideas", "Better use of known languages", "Overall advancement of computing", "Increased ability to learn new languages"], a: 0, e: "Knowing broader concepts lets programmers simulate advanced structures even in restrictive languages." },
+  { c: "Reasons to Study", q: "Picking the best-suited language for a problem domain, instead of defaulting to a familiar one, reflects…", o: ["Better use of known languages", "Improved background for choosing appropriate languages", "Better understanding of implementation mechanics", "Increased capacity to express ideas"], a: 1, e: "Wide knowledge of language constructs helps developers pick the best tool for the problem." },
+  { c: "Reasons to Study", q: "Understanding stack allocation vs. heap overhead to debug subtle errors is an example of…", o: ["Overall advancement of computing", "Increased ability to learn new languages", "Better understanding of implementation mechanics", "Improved background for choosing languages"], a: 2, e: "Knowing about compilation, execution and run-time storage management explains why constructs are designed the way they are." },
+  { c: "Reasons to Study", q: "Discovering powerful, previously ignored features in a language you already use every day is called…", o: ["Better use of known languages", "Increased capacity to express ideas", "Overall advancement of computing", "Improved background for choosing languages"], a: 0, e: "Modern languages are large, and studying the concepts helps you find features you have been ignoring." },
+  { c: "Reasons to Study", q: "A firm grasp of inheritance, dynamic binding and functional forms makes learning Rust, Swift or Go faster. Which reason is this?", o: ["Better use of known languages", "Increased ability to learn new languages", "Better understanding of implementation mechanics", "Overall advancement of computing"], a: 1, e: "Core abstractions carry over, so new languages are faster to learn." },
+  { c: "Reasons to Study", q: "Informed practitioners helping better languages replace poorly designed ones that survive only through habit is called…", o: ["Increased capacity to express ideas", "Improved background for choosing languages", "Better use of known languages", "Overall advancement of computing"], a: 3, e: "Informed developers push for elegant, reliable languages over poorly designed ones." },
+
+  // 2. Programming Domains
+  { c: "Programming Domains", q: "Which domain is characterised by arrays/matrices, heavy floating-point math, counting loops and a priority on execution efficiency?", o: ["Business applications", "Scientific applications", "Artificial intelligence", "Web software"], a: 1, e: "Scientific applications are traditionally served by Fortran, ALGOL 60 and Julia." },
+  { c: "Programming Domains", q: "Precise decimal representations and elaborate report formatting are key needs of which domain?", o: ["Business applications", "Scientific applications", "Artificial intelligence", "Web software"], a: 0, e: "Business applications use languages such as COBOL, SQL and PL/I." },
+  { c: "Programming Domains", q: "Which language is listed as a primary language for business applications?", o: ["Fortran", "Prolog", "COBOL", "Julia"], a: 2, e: "COBOL, SQL and PL/I are listed for business applications." },
+  { c: "Programming Domains", q: "Symbolic computing, dynamic linked-list structures and run-time code generation are characteristics of…", o: ["Scientific applications", "Business applications", "Artificial intelligence", "Web software"], a: 2, e: "The notes list Lisp, Scheme, Prolog and Python for AI." },
+  { c: "Programming Domains", q: "Which domain is described as an eclectic mix of markup, client/server scripting and enterprise backend platforms?", o: ["Web software", "Artificial intelligence", "Business applications", "Scientific applications"], a: 0, e: "Web software uses JavaScript, PHP, HTML/CSS, Java and C#." },
+  { c: "Programming Domains", q: "Which of these languages is listed for the scientific domain?", o: ["COBOL", "Lisp", "PHP", "Fortran"], a: 3, e: "Fortran, ALGOL 60 and Julia are listed for scientific applications." },
+
+  // 3. Evaluation Criteria
+  { c: "Evaluation Criteria", q: "Historically, software maintenance costs about how much compared with initial development?", o: ["Half as much", "About the same", "2 to 4 times as much", "10 times as much"], a: 2, e: "Because maintenance costs so much, readability matters a great deal." },
+  { c: "Evaluation Criteria", q: "Which criterion most directly determines long-term software maintainability?", o: ["Writability", "Readability", "Cost", "Expressivity"], a: 1, e: "Readability is how easily code can be read and understood." },
+  { c: "Evaluation Criteria", q: "The degree to which a program performs to its specifications under all run-time conditions is…", o: ["Reliability", "Readability", "Writability", "Orthogonality"], a: 0, e: "Reliability depends on type checking, exception handling and restricted aliasing." },
+  { c: "Evaluation Criteria", q: "Which set of factors influences reliability?", o: ["Simplicity, orthogonality, syntax design", "Training, writing, compilation", "Type checking, exception handling, restricted aliasing", "Expressivity and abstraction only"], a: 2, e: "These three factors are listed for reliability in the criteria table." },
+  { c: "Evaluation Criteria", q: "Having multiple ways to perform the exact same operation is called…", o: ["Orthogonality", "Feature multiplicity", "Aliasing", "Operator overloading"], a: 1, e: "Feature multiplicity hurts simplicity because programmers end up learning different subsets of the language." },
+  { c: "Evaluation Criteria", q: "Which example shows that C lacks orthogonality?", o: ["C has no Boolean type", "Structs can be returned from functions, but arrays cannot", "C uses braces instead of end if", "C supports count++"], a: 1, e: "An orthogonal language would let its constructs combine without exceptions like this one." },
+  { c: "Evaluation Criteria", q: "Which language is cited as an example of over-orthogonality leading to unnecessary complexity?", o: ["ALGOL 68", "Ada", "C", "Fortran"], a: 0, e: "Too much orthogonality, as in ALGOL 68, adds complexity." },
+  { c: "Evaluation Criteria", q: "Writing timeout = true instead of timeout = 1 improves readability through…", o: ["Syntax design", "Data types", "Expressivity", "Restricted aliasing"], a: 1, e: "A proper Boolean type makes the code's meaning explicit." },
+  { c: "Evaluation Criteria", q: "Ada's 'end if' and 'end loop' improve readability as an example of…", o: ["Data types", "Expressivity", "Syntax design", "Type checking"], a: 2, e: "Explicit special words are clearer than an ambiguous closing brace }." },
+  { c: "Evaluation Criteria", q: "count++ in C and short-circuit 'and then' in Ada are examples of…", o: ["Orthogonality", "Expressivity", "Restricted aliasing", "Exception handling"], a: 1, e: "Expressivity means convenient shorthand for specifying computations." },
+  { c: "Evaluation Criteria", q: "Restricted aliasing means minimising situations where…", o: ["Variables have long names", "Two distinct variable names reference the same memory location", "Functions are overloaded", "Types are checked at run time"], a: 1, e: "Aliasing can cause subtle bugs, so restricting it improves reliability." },
+  { c: "Evaluation Criteria", q: "According to the notes, type checking at compile time is…", o: ["Cheaper and safer than at run time", "More expensive than at run time", "Impossible in most languages", "Only for scripting languages"], a: 0, e: "Errors caught at compile time cost less to fix." },
+
+  // 4. Influences on Language Design
+  { c: "Design Influences", q: "In von Neumann-based imperative languages, variables model…", o: ["CPU registers", "Hardware memory cells", "The system bus", "Instructions"], a: 1, e: "Variables model memory cells, and assignment models moving data between memory and the CPU." },
+  { c: "Design Influences", q: "What is the von Neumann bottleneck?", o: ["Slow compilation", "The data transfer rate between CPU and memory", "Limited disk space", "Too many CPU registers"], a: 1, e: "The CPU–memory connection limits speed." },
+  { c: "Design Influences", q: "Why do imperative languages favour iterative loops?", o: ["They exploit fast sequential instruction fetching and avoid recursive stack overhead", "They are easier to read than recursion", "Recursion is impossible on von Neumann machines", "Loops use less source code"], a: 0, e: "Iteration suits the way von Neumann hardware fetches instructions in sequence." },
+  { c: "Design Influences", q: "The 1970s structured programming movement exposed deficiencies such as…", o: ["Lack of inheritance", "Misuse of goto and inadequate compile-time type checking", "Slow JIT compilers", "Missing markup support"], a: 1, e: "Top-down design and stepwise refinement exposed these weaknesses." },
+  { c: "Design Influences", q: "Which languages are associated with late-1970s data-oriented design and abstract data types?", o: ["Smalltalk and Ruby", "SIMULA 67 and Ada", "Fortran and COBOL", "Prolog and Lisp"], a: 1, e: "Data abstraction and ADTs came in with SIMULA 67 and Ada." },
+  { c: "Design Influences", q: "Object-oriented programming combines data abstraction with…", o: ["goto and pointers", "Inheritance and dynamic method binding", "Predicate calculus", "Markup and scripting"], a: 1, e: "Smalltalk, C++, Java, C# and Ruby are object-oriented examples." },
+  { c: "Design Influences", q: "In the 1950s–1960s, language design focused mainly on…", o: ["Machine efficiency and simple numerical algorithms", "Object orientation", "Data abstraction", "Web scripting"], a: 0, e: "Early computing focused on getting efficient numerical work out of the machine." },
+
+  // 5. Categories & Implementation
+  { c: "Categories & Implementation", q: "Prolog belongs to which language category?", o: ["Imperative", "Functional", "Logic", "Markup/programming hybrid"], a: 2, e: "Logic languages use rules, predicate calculus and resolution theorem proving." },
+  { c: "Categories & Implementation", q: "Haskell, Scheme, ML and F# belong to which category?", o: ["Functional", "Logic", "Imperative", "Markup/programming hybrid"], a: 0, e: "Functional languages compute by evaluating mathematical functions." },
+  { c: "Categories & Implementation", q: "XSLT and JSTL are examples of…", o: ["Logic languages", "Markup/programming hybrids", "Functional languages", "Compiled languages"], a: 1, e: "These hybrids extend document markup with processing control constructs." },
+  { c: "Categories & Implementation", q: "According to the notes, scripting languages like Python and JavaScript fall under which category?", o: ["Functional", "Logic", "Imperative", "Markup"], a: 2, e: "Imperative languages are state-based, and the notes include scripting and object-oriented languages under them." },
+  { c: "Categories & Implementation", q: "Which implementation method gives maximum execution speed but a slower translation phase?", o: ["Pure interpretation", "Compilation", "Hybrid implementation", "Markup processing"], a: 1, e: "C, C++ and Fortran are compiled to native machine code." },
+  { c: "Categories & Implementation", q: "Pure interpretation is typically how much slower than compiled execution?", o: ["2x–4x", "10x–100x", "1000x", "No slower"], a: 1, e: "The trade-off is flexibility and easier debugging." },
+  { c: "Categories & Implementation", q: "Java on the JVM, Python and C# on the CLR are examples of…", o: ["Pure interpretation", "Pure compilation", "Hybrid implementation", "Logic programming"], a: 2, e: "Source is compiled to intermediate bytecode and run by a virtual machine." },
+  { c: "Categories & Implementation", q: "A Just-In-Time (JIT) compiler…", o: ["Translates source to native code before shipping", "Compiles bytecode into native machine code at run time", "Interprets each statement without translation", "Only checks syntax"], a: 1, e: "Modern JVMs and the V8 engine use JIT compilation." },
+  { c: "Categories & Implementation", q: "What does the lexical analyzer produce in the compiler pipeline?", o: ["A parse tree", "Tokens", "Machine code", "Bytecode"], a: 1, e: "Lexical analysis breaks the source into tokens." },
+  { c: "Categories & Implementation", q: "Which phase produces the parse tree?", o: ["Lexical analyzer", "Syntax analyzer", "Code optimizer", "Code generator"], a: 1, e: "The syntax analyzer builds a parse tree from the tokens." },
+  { c: "Categories & Implementation", q: "Which structure do all compiler phases interact with continuously?", o: ["The call stack", "The heap", "The symbol table", "The parse queue"], a: 2, e: "The symbol table holds information about identifiers for every phase." },
+];
+
+const $ = id => document.getElementById(id);
+let deck = [], current = 0, score = 0, topic = "All sections", opts = [];
+
+// Fill the section dropdown
+const topics = ["All sections", ...new Set(QUESTIONS.map(q => q.c))];
+$("category").innerHTML = topics.map(t => `<option>${t}</option>`).join("");
+
+function show(screen) {
+  ["start", "quiz", "result"].forEach(s => $(s).classList.toggle("hidden", s !== screen));
+}
+
+function getBest(t) {
+  try { return Number(localStorage.getItem("cosc407-best:" + t)) || 0; } catch { return 0; }
+}
+function setBest(t, v) {
+  try { localStorage.setItem("cosc407-best:" + t, v); } catch {}
+}
+function showBest() {
+  const b = getBest($("category").value);
+  $("best").textContent = b ? `Best score: ${b}%` : "";
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  topic = $("category").value;
+  const pool = topic === "All sections" ? QUESTIONS : QUESTIONS.filter(q => q.c === topic);
+  deck = shuffle(pool).slice(0, Number($("length").value));
+  current = 0; score = 0;
+  show("quiz");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = deck[current];
+  // Shuffle the options so the correct answer isn't always in the same place
+  opts = shuffle(q.o.map((text, i) => ({ text, ok: i === q.a })));
+  $("progress").textContent = `Question ${current + 1} of ${deck.length}`;
+  $("topic").textContent = q.c;
+  $("barFill").style.width = `${(current / deck.length) * 100}%`;
+  $("question").textContent = q.q;
+  $("explain").classList.add("hidden");
+  $("nextBtn").classList.add("hidden");
+  $("options").innerHTML = "";
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.text;
+    btn.onclick = () => answer(i);
+    $("options").appendChild(btn);
+  });
+}
+
+function answer(choice) {
+  const right = opts[choice].ok;
+  $("options").querySelectorAll("button").forEach((b, i) => {
+    b.disabled = true;
+    if (opts[i].ok) b.classList.add("correct");
+    else if (i === choice) b.classList.add("wrong");
+  });
+  if (right) score++;
+  $("explain").textContent = (right ? "✅ Correct! " : "❌ Not quite. ") + deck[current].e;
+  $("explain").classList.remove("hidden");
+  $("nextBtn").textContent = current + 1 < deck.length ? "Next" : "See results";
+  $("nextBtn").classList.remove("hidden");
+  $("nextBtn").focus();
+}
+
+function next() {
+  current++;
+  if (current < deck.length) return renderQuestion();
+  const pct = Math.round((score / deck.length) * 100);
+  if (pct > getBest(topic)) setBest(topic, pct);
+  $("score").textContent = `${score} / ${deck.length}`;
+  $("message").textContent =
+    pct === 100 ? "Perfect score! 🎉" :
+    pct >= 70 ? "Great job!" :
+    pct >= 40 ? "Not bad. Review the notes and try again!" : "Keep studying. You'll get there!";
+  show("result");
+}
+
+$("startBtn").onclick = startQuiz;
+$("nextBtn").onclick = next;
+$("againBtn").onclick = () => { show("start"); showBest(); };
+$("category").onchange = showBest;
+showBest();
+
+// Register the service worker so the app works offline and can be installed
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+}
+</script>
+</body>
+</html>
